@@ -3,9 +3,12 @@
 //************************************************************************
 #include <DS1307_HENNING.h>
 #include <UTFT.h>
+#include <UTouch.h>
 #include <DallasTemperature.h>
 #include <OneWire.h>
 #include <dht11.h>
+#include <avr/pgmspace.h>
+
 
 //****************************************************************************************************
 //****************** Variables de texos y fuentes ****************************************************
@@ -31,12 +34,17 @@ const byte calefactor = 42;       // Pin que conecta el calentador
 const byte temhum = 48;           // pin que lee la temperatura y humedad ambiente
 const byte sensores = 49;         // Pin que lee los sensores de temperatura
 const byte nivel1 = 58;           // pin analogico que verifica el nivel de acuario
+const byte nivel2 = 59;           // pin anlogico que verifica el nivel del deposito
 //*******************************************************************************************************
 //*********** Variables de las huellas de la pantalla táctil y la pantalla de inicio ********************
 //*******************************************************************************************************
-UTFT myGLCD(ITDB32WD, 38, 39, 40, 41); // "ITDB32WD" es el modelo del LCD
+UTFT      myGLCD(ITDB32WD, 38, 39, 40, 41);   // "ITDB32WD" es el modelo del LCD
+UTouch   myTouch(6, 5, 4, 3, 2);             //pines usados por touch
 
+byte pantallaNo = 0;
 unsigned long previomillis = 0;
+unsigned long previomillis_2 = 0;
+int interval = 60;
 
 //*****************************************************************************************
 //*********************** Parametros ******************************************************
@@ -92,6 +100,13 @@ byte contador_temp = 0;
 float temperatura_agua_temp = 0;  // Temperatura temporal
 
 //*******************************************************************************************************
+//********************** Variables temporales  control de temperatura del agua **************************
+//*******************************************************************************************************
+float tempteS;
+float tempteO;
+float tempteA;
+
+//*******************************************************************************************************
 //********************** Variables del control de temperatura del agua deposito *************************
 //*******************************************************************************************************
 
@@ -107,13 +122,40 @@ int min_cnt;
 byte led_out1;
 byte led_out2;
 byte led_out3;
-byte led_on_minuto = 2;                  //minuto de encendio
-byte led_on_hora = 10;                   //hora de encendido
+byte led_on_minuto = 58;                  //minuto de encendio
+byte led_on_hora = 12;                   //hora de encendido
 byte led_off_minuto = 00;                 //minuto de apagado
 byte led_off_hora = 17;                  //hora de apagado
 byte amanecer_anochecer = 30;            //duracion periodo de amanecer y anochecer
 byte pwm_definido = 240;
 
+//*******************************************************************************************************
+//********************** Variables de cambio parcial de agua automatico *********************************
+//*******************************************************************************************************
+
+byte hora = 0;
+byte minuto = 0;
+byte duracionmaximacpa = 0;
+byte semana_e[7];           //
+byte cpa_status = 0x0;      // 0 = false  y  1 = temperature
+//bit 1 = señaliza cpa automactica funcionando
+//bit 2 = señaliza falla durante cpa automatica
+
+//*******************************************************************************************************
+//********************** Variables temporales de cambio parcial de agua automatico **********************
+//*******************************************************************************************************
+
+byte temp2hora;
+byte temp2minuto;
+byte temp2duracionmximacpa;
+byte semana[7];
+
+//*******************************************************************************************************
+//********************** Variables de control de nivel **************************************************
+//*******************************************************************************************************
+
+boolean nivel_status1 = 0;            //señaliza nivel bajo sensor 1
+boolean nivel_status2 = 0;            //señaliza nivel bajo sensor 2
 //*******************************************************************************************************
 //********************** Variables del control de la potencia de los leds *******************************
 //*******************************************************************************************************

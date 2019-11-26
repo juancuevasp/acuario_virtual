@@ -1,17 +1,23 @@
 void loop()
 {
-  t = rtc.getTime();                          //Actualiza los tiempos del sistema
-  nivel_leds();                               //actuliza la potencia de salida de los leds
-  draw_hour();                                //imprime hora en pantalla
-  draw_screen();
+  t = rtc.getTime();        //Actualiza los tiempos del sistema
+  nivel_leds();             //actualiza la potencia de salida de los leds                   //actualiza hora en pantalla
+  if (myTouch.dataAvailable())
+  {
+  processMyTouch();         //verifica si el lcd esta siendo tocado
+  }
 
-  if (millis() - previomillis > 5000)
+  if (millis() - previomillis > 5000)           //verifica funciones cada 5 seg
   {
     revisar_temperaturas();                     //verifica las revisar_temperaturas
     temp_hum();
     min_cnt = NumMins(t.hour, t.min);           //actualiza intervalo para determinar potencia de los leds
-    Serial.println(led_out1);
-    Serial.println(LedPorcentaje(led_out1));
     previomillis = millis();
+  }
+
+  if (pantallaNo == 0)
+  {
+    draw_screen();
+    reloj();
   }
 }

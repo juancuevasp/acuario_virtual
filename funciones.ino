@@ -19,16 +19,21 @@ void myAnalogWrite(int pin, byte pwm)
   }
 }
 
+int myAnalogRead(int pin)
+{
+  int value = 6666;
+
+  if ((pin >= 0) && (pin <= MAX_PIN_NUMBER))
+  {
+    value = analogRead(pin);
+  }
+  return value;
+}
+
 void myPinMode(int pin, boolean mode)
 {
   if ((pin >= 0) && (pin <= MAX_PIN_NUMBER))
   {
     pinMode(pin, mode);
   }
-}
-
-void drawFillRect(int x1, byte y1, int x2, byte y2, byte r, byte g, byte b)
-{
-  myGLCD.setColor(r, g, b);
-  myGLCD.fillRect(x1, y1, x2, y2);
 }

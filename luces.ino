@@ -10,8 +10,6 @@ int LedPorcentaje (int Led_out)           //devuelve la salida del led en %
   {
     result = map(Led_out, 1, 255, 1, 100);
   }
-  
-
   return result;
 }
 

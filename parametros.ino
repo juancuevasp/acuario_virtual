@@ -75,3 +75,15 @@ void temp_hum()                         //mide temperatura y humedad ambiente
   temp_ambiente = (DHT.temperature);   //lee temperatura ambiente
   hum_ambiente = (DHT.humidity);       //lee humedad ambiente
 }
+
+void revisar_nivel()
+{
+  if ((myAnalogRead(nivel1) > 400) && (bitRead(cpa_status, 1) == false))
+  {
+    nivel_status1 = true;           //señliza nivel bajo en el acuario
+  }
+  else
+  {
+    nivel_status2 = false;          //señaliza nivel normal en el acuario
+  }
+}
