@@ -20,44 +20,44 @@ void nivel_leds()
 
   if (NumMins(led_off_hora, led_off_minuto) > NumMins(led_on_hora, led_on_minuto))   //revisa en que periodo se encuentra
   {
-    if ((NumMins(t.hour, t.min) >= (NumMins(led_on_hora, led_on_minuto) - amanecer_anochecer)) && (NumMins(t.hour, t.min) <= (NumMins(led_off_hora, led_off_minuto) + amanecer_anochecer)))
+    if ((NumMins(t.hour, t.min) >= (NumMins(led_on_hora, led_on_minuto) - dawn_dusk)) && (NumMins(t.hour, t.min) <= (NumMins(led_off_hora, led_off_minuto) + dawn_dusk)))
     {
-      if ((NumMins(t.hour, t.min) >= (NumMins(led_on_hora, led_on_minuto) - amanecer_anochecer)) && (NumMins(t.hour, t.min) <= NumMins(led_on_hora, led_on_minuto)))
+      if ((NumMins(t.hour, t.min) >= (NumMins(led_on_hora, led_on_minuto) - dawn_dusk)) && (NumMins(t.hour, t.min) <= NumMins(led_on_hora, led_on_minuto)))
       {
-        led_out1 = led_out2 = led_out3 = map(NumMins(t.hour, t.min), (NumMins(led_on_hora, led_on_minuto) - amanecer_anochecer), NumMins(led_on_hora, led_on_minuto), 0, pwm_definido);
+        led_out1 = led_out2 = led_out3 = map(NumMins(t.hour, t.min), (NumMins(led_on_hora, led_on_minuto) - dawn_dusk), NumMins(led_on_hora, led_on_minuto), 0, pwm_definite);
       }
-      else if ((NumMins(t.hour, t.min) >= NumMins(led_off_hora, led_off_minuto)) && (NumMins(t.hour, t.min) <= (NumMins(led_off_hora, led_off_minuto) + amanecer_anochecer)))
+      else if ((NumMins(t.hour, t.min) >= NumMins(led_off_hora, led_off_minuto)) && (NumMins(t.hour, t.min) <= (NumMins(led_off_hora, led_off_minuto) + dawn_dusk)))
       {
-        led_out1 = led_out2 = led_out3 = map(NumMins(t.hour, t.min), NumMins(led_off_hora, led_off_minuto), (NumMins(led_off_hora, led_off_minuto) + amanecer_anochecer), pwm_definido, 0);
+        led_out1 = led_out2 = led_out3 = map(NumMins(t.hour, t.min), NumMins(led_off_hora, led_off_minuto), (NumMins(led_off_hora, led_off_minuto) + dawn_dusk), pwm_definite, 0);
       }
       else
       {
-        led_out1 = led_out2 = led_out3 = pwm_definido;
+        led_out1 = led_out2 = led_out3 = pwm_definite;
       }
     }
   }
   else if (NumMins(led_off_hora, led_off_minuto) < NumMins(led_on_hora, led_on_minuto))
   {
-    if (NumMins(t.hour, t.min) >= (NumMins(led_on_hora, led_on_minuto) - amanecer_anochecer))
+    if (NumMins(t.hour, t.min) >= (NumMins(led_on_hora, led_on_minuto) - dawn_dusk))
     {
-      if ((NumMins(t.hour, t.min) >= (NumMins(led_on_hora, led_on_minuto) - amanecer_anochecer)) && (NumMins(t.hour, t.min) <= NumMins(led_on_hora, led_on_minuto)))
+      if ((NumMins(t.hour, t.min) >= (NumMins(led_on_hora, led_on_minuto) - dawn_dusk)) && (NumMins(t.hour, t.min) <= NumMins(led_on_hora, led_on_minuto)))
       {
-        led_out1 = led_out2 = led_out3 = map(NumMins(t.hour, t.min), (NumMins(led_on_hora, led_on_minuto) - amanecer_anochecer), NumMins(led_on_hora, led_on_minuto), 0, pwm_definido);
+        led_out1 = led_out2 = led_out3 = map(NumMins(t.hour, t.min), (NumMins(led_on_hora, led_on_minuto) - dawn_dusk), NumMins(led_on_hora, led_on_minuto), 0, pwm_definite);
       }
       else
       {
-        led_out1 = led_out2 = led_out3 = pwm_definido;
+        led_out1 = led_out2 = led_out3 = pwm_definite;
       }
     }
-    else if (NumMins(t.hour, t.min) <= (NumMins(led_off_hora, led_off_minuto) + amanecer_anochecer))
+    else if (NumMins(t.hour, t.min) <= (NumMins(led_off_hora, led_off_minuto) + dawn_dusk))
     {
-      if ((NumMins(t.hour, t.min) <= (NumMins(led_off_hora, led_off_minuto) + amanecer_anochecer)) && (NumMins(t.hour, t.min) >= NumMins(led_off_hora, led_off_minuto)))
+      if ((NumMins(t.hour, t.min) <= (NumMins(led_off_hora, led_off_minuto) + dawn_dusk)) && (NumMins(t.hour, t.min) >= NumMins(led_off_hora, led_off_minuto)))
       {
-        led_out1 = led_out2 = led_out3 = map(NumMins(t.hour, t.min), (NumMins(led_off_hora, led_off_minuto) + amanecer_anochecer), NumMins(led_off_hora, led_off_minuto), pwm_definido, 0);
+        led_out1 = led_out2 = led_out3 = map(NumMins(t.hour, t.min), (NumMins(led_off_hora, led_off_minuto) + dawn_dusk), NumMins(led_off_hora, led_off_minuto), pwm_definite, 0);
       }
       else
       {
-        led_out1 = led_out2 = led_out3 = pwm_definido;
+        led_out1 = led_out2 = led_out3 = pwm_definite;
       }
     }
     else
@@ -92,9 +92,9 @@ void nivel_leds()
       led_out1 = led_out2 = led_out3 = (check(&wled[t1], &wled[t2], sstep));
     }
   }
-  myAnalogWrite(ledblanco1, led_out1);
-  myAnalogWrite(ledblanco2, led_out2);
-  myAnalogWrite(ledblanco3, led_out3);
+  myAnalogWrite(ledWhite1, led_out1);
+  myAnalogWrite(ledWhite2, led_out2);
+  myAnalogWrite(ledWhite3, led_out3);
 }
 
 int check (byte *pt1, byte *pt2, int lstep)

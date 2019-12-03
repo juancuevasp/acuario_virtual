@@ -4,9 +4,9 @@ void clrscreen()
   myGLCD.fillScr(12, 6, 140);       //define color de la pantalla
 }
 
-void reloj()                         //dihuja fecha y hora en la parte inferior de la pantalla
+void clockFooter()                         //dihuja fecha y hora en la parte inferior de la pantalla
 {
-  selecFuente(SMALL, 255, 255, 255, 12, 6, 140);
+  setFont(SMALL, 255, 255, 255, 12, 6, 140);
   myGLCD.print(rtc.getDOWStr(), 7, 223);      //dia de la semana
   myGLCD.print(String(t.date), 85, 223);      //dia del mes
   myGLCD.print(String("DE"), 113, 223);
@@ -38,7 +38,7 @@ void draw_screen(boolean refreshAll = false)
 
   if (refreshAll == true)
   {
-    selecFuente (SMALL, 255, 255, 255, 12, 6, 140);
+    setFont (SMALL, 255, 255, 255, 12, 6, 140);
     myGLCD.print(String("POTENCIA DE LUCES"), 30, 10);
 
     //dibuja regla que marca el porcentaje
@@ -195,8 +195,8 @@ void draw_screen(boolean refreshAll = false)
   }
 
   myGLCD.setColor(0, 255, 0);
-  myGLCD.printNumF(temp_ambiente, 2, 330, 147);   //imprime temperatura ambiente
-  myGLCD.printNumF(hum_ambiente, 2, 325, 169);    //imprime humedad ambiente
+  myGLCD.printNumF(room_temp, 2, 330, 147);   //imprime temperatura ambiente
+  myGLCD.printNumF(ambient_hum, 2, 325, 169);    //imprime humedad ambiente
 
 
 }

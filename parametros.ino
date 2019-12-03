@@ -1,8 +1,8 @@
 void revisar_temperaturas() //Revisa temperaturas
 {
   sensors.requestTemperatures();                                       //llamada para todos los sensores
-  tempC = (sensors.getTempC(sensor_agua));            //lee temperatura del agua
-  tempD = (sensors.getTempC(sensor_deposito));   //lee temperatura del agua del deposito
+  tempC = (sensors.getTempC(aquarium_sensor));            //lee temperatura del agua
+  tempD = (sensors.getTempC(deposit_sensor));   //lee temperatura del agua del deposito
 /*
   if (contador_temp == 5)
   {
@@ -30,7 +30,7 @@ void revisar_temperaturas() //Revisa temperaturas
   {
     outlets_changed[0] = false;
     bitWrite(status_parametros, 0, 0);
-    myDigitalWrite(calefactor, LOW);
+    myDigitalWrite(heater, LOW);
   }
 
   if (outlets[0] == 0)
@@ -38,7 +38,7 @@ void revisar_temperaturas() //Revisa temperaturas
     if ((tempC < (setTempC + offTempC)) || (tempC > (setTempC - offTempC)))      //desconecta calefactor
     {
       bitWrite(status_parametros, 0, 0);
-      myDigitalWrite(calefactor, LOW);
+      myDigitalWrite(heater, LOW);
     }
 
     if (offTempC > 0)
@@ -46,39 +46,39 @@ void revisar_temperaturas() //Revisa temperaturas
       if (tempC < (setTempC -offTempC))     //conecta calefactor
       {
         bitWrite(status_parametros, 0, 1);
-        myDigitalWrite(calefactor, HIGH);
+        myDigitalWrite(heater, HIGH);
       }
     }
 
     if ((tempC > 40) || (tempC < 10))
     {
       bitWrite(status_parametros, 0, 0);
-      myDigitalWrite(calefactor, LOW);
+      myDigitalWrite(heater, LOW);
     }
   }
 
   if (outlets[0] == 1)
   {
     bitWrite(status_parametros, 0, 1);
-    myDigitalWrite(calefactor, HIGH);
+    myDigitalWrite(heater, HIGH);
   }
   else if (outlets[0] == 2)
   {
     bitWrite(status_parametros, 0, 0);
-    myDigitalWrite(calefactor, LOW);
+    myDigitalWrite(heater, LOW);
   }
 }
 
 void temp_hum()                         //mide temperatura y humedad ambiente
 {
   DHT.read(temhum);                     //llamada para el sensor
-  temp_ambiente = (DHT.temperature);   //lee temperatura ambiente
-  hum_ambiente = (DHT.humidity);       //lee humedad ambiente
+  room_temp = (DHT.temperature);   //lee temperatura ambiente
+  ambient_hum = (DHT.humidity);       //lee humedad ambiente
 }
 
 void revisar_nivel()
 {
-  if ((myAnalogRead(nivel1) > 400) && (bitRead(cpa_status, 1) == false))
+  if ((myAnalogRead(aquaLevel) > 400) && (bitRead(cpa_status, 1) == false))
   {
     nivel_status1 = true;           //señliza nivel bajo en el acuario
   }

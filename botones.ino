@@ -9,7 +9,7 @@ const byte graF[] = {10, 127, 150, 167};    //menu graficos
 const int cpaA[] = {170, 27, 310, 67};      //menu cambio parcial de agua
 const int iniC[] = {325, 27, 390, 67};      //boton inicio
 const int menU[] = {325, 77, 390, 117};     //boton menu
-const int guaR[] = {325, 172, 390, 210};    //boton guardar
+const int savE[] = {325, 172, 390, 210};    //boton guardar
 const byte horU[] = {70, 18, 95, 43};       //boton mas hora
 const byte horD[] = {70, 69, 95, 92};       //boton menos hora
 const byte minU[] = {160, 18, 185, 43};     //boton mas minutos
@@ -44,15 +44,15 @@ const int satU[] = {210, 146, 290, 186};    //sabado cpa
 const byte sunD[] = {120, 193, 200, 233};   //domingo cpa
 const int estT[] = {210, 193, 290, 233};    //estado cpa
 
-void impCabecera (const char* texto)
+void printHeader (const char* texto)
 {
-  selecFuente(SMALL, 255, 255, 0, 255, 255, 0);
+  setFont(SMALL, 255, 255, 0, 255, 255, 0);
   myGLCD.fillRect(1, 1, 310, 14);
   myGLCD.setColor(0, 0, 0);
   myGLCD.print(texto, 5, 4);
 }
 
-void selecFuente(boolean font, byte cr, byte cg, byte cb, byte br, byte bg, byte bb)
+void setFont(boolean font, byte cr, byte cg, byte cb, byte br, byte bg, byte bb)
 {
   myGLCD.setBackColor (br, bg, bb);        //color de fondo
   myGLCD.setColor (cr, cg, cb);            //color principal
@@ -74,7 +74,7 @@ void tocado(int x1, int y1, int x2, int y2)
   myGLCD.drawRoundRect(x1, y1, x2, y2);
 }
 
-void impBoton (const char* texto, int x1, int y1, int x2, int y2, boolean setFont = false, byte cor = 0)
+void printButton (const char* texto, int x1, int y1, int x2, int y2, boolean setFont = false, byte cor = 0)
 {
   int stl = strlen(texto);
   int fx, fy;
@@ -107,7 +107,7 @@ void drawFillRect(int x1, byte y1, int x2, byte y2, byte r, byte g, byte b)
   myGLCD.fillRect(x1, y1, x2, y2);
 }
 
-boolean revisarBoton(int x1, int y1, int x2, int y2)
+boolean checkButton(int x1, int y1, int x2, int y2)
 {
   boolean match = false;
   int touch_x = map((myTouch.getX()),399,0,0,399);

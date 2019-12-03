@@ -5,11 +5,6 @@ void setup()
 
   configpins();     //define las funciones de los pines
 
-  // Las siguientes líneas se pueden comentar para usar los valores ya almacenados en el DS1307
-  //rtc.setDOW(DOMINGO);        // Set Day-of-Week to SUNDAY
-  //rtc.setTime(18, 0 , 0);     // Set the time to 12:00:00 (24hr format)
-  //rtc.setDate(3, 10, 2010);   // Set the date to October 3th, 2010
-
   myGLCD.InitLCD();                         //inicia pantalla
   clrscreen();                              //Borra pantalla
 
@@ -17,14 +12,26 @@ void setup()
   myTouch.setPrecision(PREC_MEDIUM);        //define precision de touch screen
 
   sensors.begin();                          //inicia la lectura de las sondas de temperatura_agua_tempatura
-  sensors.setResolution(sensor_agua, 10);   //establece la resolucion en 10 bit
+  sensors.setResolution(aquarium_sensor, 10);   //establece la resolucion en 10 bit
+  sensors.setResolution(deposit_sensor, 10);    //establece la resolucion en 10 bit
 
   sensors.requestTemperatures();            //llamada a todos los Sensores
-  tempC = (sensors.getTempC(sensor_agua));  //lee la tamperatura del agua
+  tempC = (sensors.getTempC(aquarium_sensor));  //lee la tamperatura del agua
+  tempD = (sensors.getTempC(deposit_sensor));   //lee la temperatura del deposito
 
   // coloca el reloj en modo de ejecución
   rtc.halt(false);
   t = rtc.getTime();
+  check_water_temp_file();    //corrige registro de temperatura
+
+  select_SD();
+  while (!SD.begin(ChipSelect_SD, SPI_QUARTER_SPEED))     //inicia comunicacion con tarjeta SD
+  {
+    setFont(LARGE, 255, 0, 0, 0, 0, 0);
+    myGLCD.print(String("INSERTE UNA TARJETA SD"), CENTER, 115);
+  }
+
+  //revisar archivo de temperatura de agua(insertar funcion)
 
   myGLCD.fillScr(12,6,140);                //Define color de pantalla
   myGLCD.setColor(255,255,255);            //Difine color general
@@ -38,10 +45,11 @@ void setup()
 
 void configpins()
 {
-  myPinMode(ledblanco1, OUTPUT);            //pin 8
-  myPinMode(ledblanco2, OUTPUT);            //pin 9
-  myPinMode(ledblanco3, OUTPUT);            //pin 10
-  myPinMode(calefactor, OUTPUT);            //pin 42
-  myPinMode(nivel1, INPUT);                 //pin A4
-  myPinMode(nivel2, INPUT);                 //pin A5
+  myPinMode(ledWhite1, OUTPUT);            //pin 8
+  myPinMode(ledWhite2, OUTPUT);            //pin 9
+  myPinMode(ledWhite3, OUTPUT);            //pin 10
+  myPinMode(heater, OUTPUT);            //pin 42
+  myPinMode(ChipSelect_SD, OUTPUT);     //pin 53/*
+  myPinMode(aquaLevel, INPUT);                 //pin A4
+  myPinMode(depoLevel, INPUT);                 //pin A5
 }

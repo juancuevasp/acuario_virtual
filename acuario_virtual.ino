@@ -8,7 +8,11 @@
 #include <OneWire.h>
 #include <dht11.h>
 #include <avr/pgmspace.h>
-
+#include <SdFat.h>
+//#include <SdFatUtil.h>
+#include <SPI.h>
+#include <EEPROM.h>
+#include <writeAnything.h>
 
 //****************************************************************************************************
 //****************** Variables de texos y fuentes ****************************************************
@@ -27,21 +31,22 @@ extern uint8_t SevenSegNumFontPlus[];
 //pines 3, 4, 5, 6 y 7 reservados para touch
 //pines 20 y 21 reservados para rtc
 //pines 22 a 41 reservados para el LCD
-const byte ledblanco1 = 8;        // Pin que conecta los leds 1
-const byte ledblanco2 = 9;        // Pin que conecta los leds 2
-const byte ledblanco3 = 10;       // Pin que conecta los leds 3
-const byte calefactor = 42;       // Pin que conecta el calentador
+const byte ledWhite1 = 8;        // Pin que conecta los leds 1
+const byte ledWhite2 = 9;        // Pin que conecta los leds 2
+const byte ledWhite3 = 10;       // Pin que conecta los leds 3
+const byte  heater= 42;       // Pin que conecta el calentador
 const byte temhum = 48;           // pin que lee la temperatura y humedad ambiente
 const byte sensores = 49;         // Pin que lee los sensores de temperatura
-const byte nivel1 = 58;           // pin analogico que verifica el nivel de acuario
-const byte nivel2 = 59;           // pin anlogico que verifica el nivel del deposito
+const byte ChipSelect_SD = 53;        //pin conectada tarjeta SD
+const byte aquaLevel = 58;           // pin analogico que verifica el nivel de acuario
+const byte depoLevel = 59;           // pin anlogico que verifica el nivel del deposito
 //*******************************************************************************************************
 //*********** Variables de las huellas de la pantalla táctil y la pantalla de inicio ********************
 //*******************************************************************************************************
 UTFT      myGLCD(ITDB32WD, 38, 39, 40, 41);   // "ITDB32WD" es el modelo del LCD
 UTouch   myTouch(6, 5, 4, 3, 2);             //pines usados por touch
 
-byte pantallaNo = 0;
+byte NoScreen = 0;
 unsigned long previomillis = 0;
 unsigned long previomillis_2 = 0;
 int interval = 60;
@@ -59,7 +64,7 @@ byte outlets[9];
 byte outlets_changed[9];
 boolean outlets_settings = false;
 unsigned long outlets_millis = 0;
-int resultado = 0;
+int result = 0;
 
 //***********************************************************************
 //**********inicia RTC***************************************************
@@ -72,22 +77,22 @@ Time t_temp, t;
 //****************************************************************************************************
 OneWire OneWireBus(sensores);        // Sensores de temperatura
 DallasTemperature sensors(&OneWireBus); // Pasa nuestra referencia OneWire a los sensores de temperatura.
-DeviceAddress sensor_agua = {0x28, 0xFF, 0xE, 0x74, 0x3B, 0x4, 0x0, 0x68} ;              // Asigna las direcciones de los sensores de temperatura.
+DeviceAddress aquarium_sensor = {0x28, 0xFF, 0xE, 0x74, 0x3B, 0x4, 0x0, 0x68} ;              // Asigna las direcciones de los sensores de temperatura.
 DeviceAddress sensor_disipador;        // Asigna las direcciones de los sensores de temperatura
-DeviceAddress sensor_deposito = {0x28, 0xFF, 0x35, 0x9C, 0x3C, 0x4, 0x0, 0xB3} ;          // Asigna las direcciones de los sensores de temperatura
-byte sonda_associada_1 = 1;
-byte sonda_associada_2 = 2;
-byte sonda_associada_3 = 3;
+DeviceAddress deposit_sensor = {0x28, 0xFF, 0x35, 0x9C, 0x3C, 0x4, 0x0, 0xB3} ;          // Asigna las direcciones de los sensores de temperatura
+//byte associated_ probe_1 = 1;
+//byte associated_ probe_2 = 2;
+//byte associated_ probe_3 = 3;
 
 //****************************************************************************************************
 //***************** Variables de sensores de temperatura y humedad ambiente **************************
 //****************************************************************************************************
 dht11 DHT;
-byte contador_th = 0;
-float temp_temporal = 0;
-float hum_temporal = 0;
-float temp_ambiente = 0;          //temperatura ambiente
-float hum_ambiente = 0;           //humedad ambiente
+byte  counted_th = 0;
+float temp_temporary = 0;
+float hum_temporary = 0;
+float room_temp = 0;          //temperatura ambiente
+float ambient_hum = 0;           //humedad ambiente
 
 //*******************************************************************************************************
 //********************** Variables del control de temperatura del agua **********************************
@@ -96,8 +101,8 @@ float tempC = 0;                  // Temperatura del agua
 float setTempC = 25.5;            // Temperatura deseada
 float offTempC = 0.5;             // Variación permitida de la temperatura
 float alarmTempC = 1;             // variación para accionar la alarma de temperatura del agua
-byte contador_temp = 0;
-float temperatura_agua_temp = 0;  // Temperatura temporal
+byte counted_temp = 0;
+float water_temperature_temp = 0;  // Temperatura temporal
 
 //*******************************************************************************************************
 //********************** Variables temporales  control de temperatura del agua **************************
@@ -111,7 +116,7 @@ float tempteA;
 //*******************************************************************************************************
 
 float tempD = 0;                        //temperatura del deposito
-float temperatura_desposito_temp = 0;   //temperatura temporal
+float deposit_temperature_temp = 0;     //temperatura temporal
 
 //*******************************************************************************************************
 //********************** Variables del control de iluminacion *******************************************
@@ -126,8 +131,8 @@ byte led_on_minuto = 58;                  //minuto de encendio
 byte led_on_hora = 12;                   //hora de encendido
 byte led_off_minuto = 00;                 //minuto de apagado
 byte led_off_hora = 17;                  //hora de apagado
-byte amanecer_anochecer = 30;            //duracion periodo de amanecer y anochecer
-byte pwm_definido = 240;
+byte dawn_dusk = 30;            //duracion periodo de amanecer y anochecer
+byte pwm_definite = 240;
 
 //*******************************************************************************************************
 //********************** Variables de cambio parcial de agua automatico *********************************
@@ -144,11 +149,18 @@ byte cpa_status = 0x0;      // 0 = false  y  1 = temperature
 //*******************************************************************************************************
 //********************** Variables temporales de cambio parcial de agua automatico **********************
 //*******************************************************************************************************
-
 byte temp2hora;
 byte temp2minuto;
 byte temp2duracionmximacpa;
 byte semana[7];
+
+//*******************************************************************************************************
+//********************** Variables de control que utilizan tarjeta SD ***********************************
+//*******************************************************************************************************
+SdFat SD;
+SdFile file;
+unsigned long log_SD_millis = 0;
+void writeCRLF(SdFile& f);
 
 //*******************************************************************************************************
 //********************** Variables de control de nivel **************************************************
